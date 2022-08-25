@@ -11,6 +11,7 @@ export class FetchPhotoAPI {
     this._page = 1;
     this._query = null;
     this._fetchedPhotoNumber = 0;
+    this._photo_per_page = PHOTO_PER_PAGE;
     this._totalPhotoNumber = 0;
   }
 

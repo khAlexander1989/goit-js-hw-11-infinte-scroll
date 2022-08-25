@@ -121,8 +121,9 @@ async function onSearchFormSubmit(event) {
     const { hits } = await fetchPhotoAPI.fetchPhoto(searchQuery);
     showTotalHits(fetchPhotoAPI._totalPhotoNumber);
     render(hits);
-    hideLoadMoreBtn();
-    showLoadMoreBtn();
+    if (hits.length >= fetchPhotoAPI._photo_per_page) {
+      showLoadMoreBtn();
+    }
   } catch (err) {
     errorHandler(err);
   }
@@ -138,7 +139,9 @@ async function onLoadMoreBtnClick(event) {
   try {
     const { hits } = await fetchPhotoAPI.fetchPhoto();
     render(hits);
-    showLoadMoreBtn();
+    if (hits.length >= fetchPhotoAPI._photo_per_page) {
+      showLoadMoreBtn();
+    }
     autoScroll();
   } catch (err) {
     errorHandler(err);
