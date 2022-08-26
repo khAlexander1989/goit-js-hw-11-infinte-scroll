@@ -12,8 +12,16 @@ button {
 
 input {
   padding: 0;
+  border: none;
+  outline: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+input:focus {
   outline: none;
   border: none;
+  box-shadow: none;
 }
 
 /* --------------HEADER-------------- */
@@ -114,6 +122,8 @@ input {
 
   border-radius: 4px;
   overflow: hidden;
+
+  transition: outline 250ms ease-out;
 }
 
 /* --------------SEARCH INPUT-------------- */
@@ -131,6 +141,8 @@ input {
   padding: 0;
   width: 35px;
   height: 100%;
+
+  transition: background-color 250ms ease-out;
 }
 
 .btn-icon {
