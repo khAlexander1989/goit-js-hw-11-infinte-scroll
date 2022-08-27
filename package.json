@@ -5,7 +5,8 @@
   "homepage": "https://khAlexander1989.github.io/goit-js-hw-11",
   "scripts": {
     "start": "parcel src/*.html",
-    "build": "parcel build src/*.html --public-url /goit-js-hw-11/"
+    "build": "parcel build src/*.html --public-url /goit-js-hw-11/",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
