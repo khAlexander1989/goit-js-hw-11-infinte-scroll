@@ -24,6 +24,7 @@ export class FetchPhotoAPI {
                           &per_page=${PHOTO_PER_PAGE}&page=${this._page}`;
 
     const response = await axios(queryParams);
+    // console.log(response.data.hits.length);
     if (!response.data.hits.length) {
       throw new notFoundError(
         'Sorry, there are no images matching your search query. Please try again.'

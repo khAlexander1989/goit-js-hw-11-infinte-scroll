@@ -12,7 +12,6 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 const refs = {
   gallery: document.querySelector('.gallery'),
   searchForm: document.querySelector('.search-form'),
-  loadMoreBtn: document.querySelector('.load-more'),
   header: document.querySelector('.page-header'),
   spinner: document.querySelector('.spinner'),
 };
@@ -22,6 +21,8 @@ const lightbox = new SimpleLightbox('.gallery a');
 const scroll = new OnlyScroll(window, {
   damping: 0.7,
 });
+
+const observer = createObserver();
 
 //-------------------------FUCTIONOS-------------------------
 
@@ -43,16 +44,6 @@ function removePhotoSetMarkup(node) {
 
 function showTotalHits(totalHits) {
   Notify.success(`Hooray! We found ${totalHits} images.`);
-}
-
-//--------------show/hide more button function--------------
-
-function showLoadMoreBtn() {
-  refs.loadMoreBtn.classList.remove('is-hidden');
-}
-
-function hideLoadMoreBtn() {
-  refs.loadMoreBtn.classList.add('is-hidden');
 }
 
 //--------------get element height function--------------
@@ -88,16 +79,25 @@ function errorHandler(error) {
     Notify.failure(error.message);
   } else if (error.name === 'dataLimitError') {
     Notify.warning(error.message);
-    hideLoadMoreBtn();
   } else {
     throw error;
   }
 }
 
+//--------------create intersection observer function --------------
+
+function createObserver() {
+  const options = {
+    root: null,
+    threshold: 1,
+  };
+
+  return new IntersectionObserver(viewportIntersectHandler, options);
+}
+
 //-------------------------EVENT LISTENERS-------------------------
 
 refs.searchForm.addEventListener('submit', onSearchFormSubmit);
-refs.loadMoreBtn.addEventListener('click', onLoadMoreBtnClick);
 
 //-------------------------EVENT HANDLERS-------------------------
 
@@ -114,15 +114,15 @@ async function onSearchFormSubmit(event) {
   }
 
   removePhotoSetMarkup(refs.gallery);
-  hideLoadMoreBtn();
   showSpinner();
 
   try {
     const { hits } = await fetchPhotoAPI.fetchPhoto(searchQuery);
     showTotalHits(fetchPhotoAPI._totalPhotoNumber);
     render(hits);
+
     if (hits.length >= fetchPhotoAPI._photo_per_page) {
-      showLoadMoreBtn();
+      observer.observe(refs.gallery.lastElementChild);
     }
   } catch (err) {
     errorHandler(err);
@@ -130,21 +130,21 @@ async function onSearchFormSubmit(event) {
   hideSpinner();
 }
 
-//--------------load more button handler--------------
+//--------------viewport intersect handler--------------
 
-async function onLoadMoreBtnClick(event) {
-  showSpinner();
-  hideLoadMoreBtn();
-
-  try {
-    const { hits } = await fetchPhotoAPI.fetchPhoto();
-    render(hits);
-    if (hits.length >= fetchPhotoAPI._photo_per_page) {
-      showLoadMoreBtn();
+async function viewportIntersectHandler([entry], observer) {
+  if (entry.isIntersecting) {
+    observer.unobserve(entry.target);
+    showSpinner();
+    try {
+      const { hits } = await fetchPhotoAPI.fetchPhoto();
+      render(hits);
+      if (hits.length >= fetchPhotoAPI._photo_per_page) {
+        observer.observe(refs.gallery.lastElementChild);
+      }
+    } catch (err) {
+      errorHandler(err);
     }
-    autoScroll();
-  } catch (err) {
-    errorHandler(err);
+    hideSpinner();
   }
-  hideSpinner();
 }
